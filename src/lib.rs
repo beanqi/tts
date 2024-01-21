@@ -1,4 +1,5 @@
 pub mod tts;
+pub mod util;
 
 #[cfg(test)]
 mod tests {

@@ -13,8 +13,6 @@ serde = { version = "1.0.188", features = ["derive"], optional = true }
 tungstenite = { version = "0.21.0", features = ["native-tls-vendored"] }
 ureq = { version = "2.7.1", features = ["json"], optional = true }
 xml = "0.8.10"
-epub = "2.1.1"
-scraper = "0.18.1" # 临时使用,后续会切换
 rodio = "0.17.3" # 音频操作
 
 [features]
