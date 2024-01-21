@@ -1,5 +1,4 @@
 ## Epub file to Speech
 
-This tool can help you to convert epub file to speech.
+This tool can help you to convert text file to speech.
 
-639 lines
