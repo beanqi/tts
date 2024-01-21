@@ -1,4 +1,6 @@
 use std::io::{BufRead, Write};
+use std::thread::sleep;
+use std::time::Duration;
 
 use epub_to_speech::tts::TTS;
 use epub_to_speech::tts::edge::Edgetts;
@@ -40,7 +42,10 @@ fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
                     break;
                 }
                 Err(_) => {
-                    // Handle the error, e.g. retry or log the error
+                    // Handle the error, e.g. retry or log the error, sleep for a while
+                    sleep(Duration::from_secs(60));
+                    zh_tts.close();
+                    let _ = zh_tts.init();
                     print!("zh_tts error: {}, try again\n", text);
                     continue;
                 }
@@ -53,6 +58,9 @@ fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
                 }
                 Err(_) => {
                     // Handle the error, e.g. retry or log the error
+                    sleep(Duration::from_secs(60));
+                    en_tts.close();
+                    let _ = en_tts.init();
                     print!("en_tts error: {}, try again\n", text);
                     continue;
                 }

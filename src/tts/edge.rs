@@ -68,6 +68,13 @@ impl Edgetts {
         Ok(())
     }
 
+    pub fn close(&mut self) {
+        self.ws.close(Some(CloseFrame{
+            code: CloseCode::Normal,
+            reason: "".into(),
+        })).unwrap();
+    }
+
 
     /// build ssml
     fn build_ssml(&self, text: &str) -> String {
