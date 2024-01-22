@@ -20,10 +20,12 @@ fn main() {
         return;
     }
 
-
+    // Open file and read lines into a vector
     let file = File::open(&args[1]).unwrap();
     let reader = BufReader::new(file);
-    let total = reader.lines().count();
+    let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
+
+    let total = lines.len();
     let pb = ProgressBar::new(total as u64);
     pb.set_style(
         indicatif::ProgressStyle::default_bar()
@@ -33,16 +35,15 @@ fn main() {
     );
 
     let mut mp3_file = File::create(format!("{}.mp3", args[1])).unwrap();
-    let mut reader = BufReader::new(File::open(&args[1]).unwrap());
-    let mut line = String::new();
-    while reader.read_line(&mut line).unwrap() > 0 {
+
+    for line in lines {
         let audio = gen_mp3(&mut en_tts, &mut zh_tts, &line);
         mp3_file.write_all(&audio).unwrap();
-        line.clear();
         pb.inc(1);
     }
     pb.finish_with_message("done");
 }
+
 
 fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
     let mut audio = Vec::new();
