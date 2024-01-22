@@ -7,7 +7,7 @@ use epub_to_speech::tts::edge::Edgetts;
 use epub_to_speech::util::contains_chinese;
 
 fn main() {
-    let mut en_tts = Edgetts::new("en-US-DavisNeural", "medium", "medium", "loud", "audio-24khz-48kbitrate-mono-mp3");
+    let mut en_tts = Edgetts::new("en-US-AndrewNeural", "medium", "medium", "loud", "audio-24khz-48kbitrate-mono-mp3");
     let mut zh_tts = Edgetts::new("zh-CN-YunjianNeural", "medium", "medium", "loud", "audio-24khz-48kbitrate-mono-mp3");
     en_tts.init().unwrap();
     zh_tts.init().unwrap();

@@ -16,7 +16,7 @@ const SYNTH_URL: &str = "wss://speech.platform.bing.com/consumer/speech/synthesi
 pub struct Edgetts {
 
     /// The voice to use for speech synthesis.
-    /// like "zh-CN-XiaoxiaoNeural", see https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support#text-to-speech
+    /// like "zh-CN-XiaoxiaoNeural", not all voice are supported, you need to test by yourself, see https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support#text-to-speech
     pub voice: String,
 
     /// The speech pitch.
