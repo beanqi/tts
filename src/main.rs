@@ -1,10 +1,12 @@
-use std::io::{BufRead, Write};
+use std::fs::File;
+use std::io::{BufReader, BufRead, Write};
 use std::thread::sleep;
 use std::time::Duration;
 
 use epub_to_speech::tts::TTS;
 use epub_to_speech::tts::edge::Edgetts;
 use epub_to_speech::util::contains_chinese;
+use indicatif::ProgressBar;
 
 fn main() {
     let mut en_tts = Edgetts::new("en-US-AndrewNeural", "medium", "medium", "loud", "audio-24khz-48kbitrate-mono-mp3");
@@ -17,17 +19,29 @@ fn main() {
         println!("Usage: {} <file>", args[0]);
         return;
     }
-    let file = std::fs::File::open(&args[1]).unwrap();    
 
-    let mut mp3_file = std::fs::File::create(format!("{}.mp3", args[1])).unwrap();
-    let mut reader = std::io::BufReader::new(file);
+
+    let file = File::open(&args[1]).unwrap();
+    let reader = BufReader::new(file);
+    let total = reader.lines().count();
+    let pb = ProgressBar::new(total as u64);
+    pb.set_style(
+        indicatif::ProgressStyle::default_bar()
+            .template("[{elapsed_precise}] [{bar:40.cyan/blue}] {pos:>7}/{len:7} {msg}")
+            .unwrap()
+            .progress_chars("#>-"),
+    );
+
+    let mut mp3_file = File::create(format!("{}.mp3", args[1])).unwrap();
+    let mut reader = BufReader::new(File::open(&args[1]).unwrap());
     let mut line = String::new();
     while reader.read_line(&mut line).unwrap() > 0 {
-        print!("generate the lines: {}\n", line);
         let audio = gen_mp3(&mut en_tts, &mut zh_tts, &line);
         mp3_file.write_all(&audio).unwrap();
         line.clear();
+        pb.inc(1);
     }
+    pb.finish_with_message("done");
 }
 
 fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
