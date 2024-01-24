@@ -44,8 +44,8 @@ impl Default for Edgetts {
             voice: "zh-CN-XiaoxiaoNeural".to_string(),
             pitch: "medium".to_string(),
             rate: "medium".to_string(),
-            volume: "medium".to_string(),
-            format: "audio-24khz-48kbitrate-mono-mp3".to_string(),
+            volume: "x-loud".to_string(),
+            format: "audio-24khz-96kbitrate-mono-mp3".to_string(),
             ws: tungstenite::connect(SYNTH_URL).unwrap().0,
         }
     }
