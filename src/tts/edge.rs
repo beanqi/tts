@@ -76,10 +76,10 @@ impl Edgetts {
     }
 
     pub fn close(&mut self) {
-        self.ws.close(Some(CloseFrame{
+        let _ = self.ws.close(Some(CloseFrame{
             code: CloseCode::Normal,
             reason: "".into(),
-        })).unwrap();
+        }));
     }
 
 
@@ -186,9 +186,9 @@ impl TTS for Edgetts {
 
 impl Drop for Edgetts {
     fn drop(&mut self) {
-        self.ws.close(Some(CloseFrame{
+        let _ = self.ws.close(Some(CloseFrame{
             code: CloseCode::Normal,
             reason: "".into(),
-        })).unwrap();
+        }));
     }
 }
