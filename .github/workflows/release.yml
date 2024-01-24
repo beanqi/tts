@@ -21,19 +21,19 @@ jobs:
           - os_name: Linux-x86_64
             os: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
-            bin: copilot2chat-linux-amd64
+            bin: epub-to-speech-linux-amd64
           - os_name: Windows-x86_64
             os: windows-latest
             target: x86_64-pc-windows-msvc
-            bin: copilot2chat-amd64.exe
+            bin: epub-to-speech-amd64.exe
           - os_name: macOS-x86_64
             os: macOS-latest
             target: x86_64-apple-darwin
-            bin: copilot2chat-darwin-amd64
+            bin: epub-to-speech-darwin-amd64
           - os_name: macOS-aarch64
             os: macOS-latest
             target: aarch64-apple-darwin
-            bin: copilot2chat-darwin-arm64
+            bin: epub-to-speech-darwin-arm64
         toolchain:
           - stable
     steps:
@@ -47,10 +47,10 @@ jobs:
           args: "--locked --release"
           strip: true
       - name: Rename binary (linux and macos)
-        run: mv target/${{ matrix.platform.target }}/release/copilot2chat target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        run: mv target/${{ matrix.platform.target }}/release/epub-to-speech target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name != 'Windows-x86_64'
       - name: Rename binary (windows)
-        run: mv target/${{ matrix.platform.target }}/release/copilot2chat.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
+        run: mv target/${{ matrix.platform.target }}/release/epub-to-speech.exe target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}
         if: matrix.platform.os_name == 'Windows-x86_64'
       - name: Generate SHA-256
         run: shasum -a 256 target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }} | cut -d ' ' -f 1 > target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin }}.sha256
