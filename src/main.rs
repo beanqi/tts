@@ -59,10 +59,13 @@ fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
                     break;
                 }
                 Err(_) => {
+                    print!("zh_tts error: {}, try again\n", text);
                     // Handle the error, e.g. retry or log the error, sleep for a while
                     sleep(Duration::from_secs(60));
-                    let _ = zh_tts.restart();
-                    print!("zh_tts error: {}, try again\n", text);
+                    let result = zh_tts.restart();
+                    if result.is_err() {
+                        println!("zh_tts restart error: {:?}", result);
+                    }
                     continue;
                 }
             }
@@ -73,10 +76,13 @@ fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
                     break;
                 }
                 Err(_) => {
+                    print!("en_tts error: {}, try again\n", text);
                     // Handle the error, e.g. retry or log the error
                     sleep(Duration::from_secs(60));
-                    let _ = zh_tts.restart();
-                    print!("en_tts error: {}, try again\n", text);
+                    let result = zh_tts.restart();
+                    if result.is_err() {
+                        println!("en_tts restart error: {:?}", result);
+                    }
                     continue;
                 }
             }

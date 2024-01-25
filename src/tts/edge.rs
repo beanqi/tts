@@ -69,17 +69,18 @@ impl Edgetts {
     }
 
     pub fn restart(&mut self) -> anyhow::Result<()> {
-        self.close();
+        self.close()?;
         self.ws = tungstenite::connect(SYNTH_URL).unwrap().0;
         self.ws.send(Message::Text(self.build_tts_config()))?;
         Ok(())
     }
 
-    pub fn close(&mut self) {
-        let _ = self.ws.close(Some(CloseFrame{
+    pub fn close(&mut self) -> anyhow::Result<()> {
+        self.ws.close(Some(CloseFrame {
             code: CloseCode::Normal,
             reason: "".into(),
-        }));
+        }))?;
+        Ok(())
     }
 
 
