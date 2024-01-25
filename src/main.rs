@@ -81,9 +81,13 @@ fn write_checkpoint(line: usize, checkpoint_file: &mut File) {
 fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
     let audio;
     if contains_chinese(text) {
-        audio = zh_tts.gen_audio(text).unwrap();
+        audio = zh_tts.gen_audio(text);
     } else {
-        audio = en_tts.gen_audio(text).unwrap();
+        audio = en_tts.gen_audio(text);
     }
-    audio
+    if audio.is_err() {
+        println!("There some error with the generation,, please try again, the checkpoint is saved.");
+        std::process::exit(1);
+    }
+    return audio.unwrap();
 }
