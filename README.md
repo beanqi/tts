@@ -17,5 +17,6 @@ unzip epub-to-speech.zip
 ## Features
 
 - [x] Support Chinese and English
+- [x] Support Checkpoint
 - [x] Support text file
 - [ ] Support epub file
