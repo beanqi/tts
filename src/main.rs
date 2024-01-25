@@ -1,7 +1,5 @@
-use std::fs::File;
-use std::io::{BufReader, BufRead, Write};
-use std::thread::sleep;
-use std::time::Duration;
+use std::fs::{File, OpenOptions};
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 
 use epub_to_speech::tts::TTS;
 use epub_to_speech::tts::edge::Edgetts;
@@ -23,8 +21,9 @@ fn main() {
     // Open file and read lines into a vector
     let file = File::open(&args[1]).unwrap();
     let reader = BufReader::new(file);
-    let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
+    let mut lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
 
+    // the progress bar
     let total = lines.len();
     let pb = ProgressBar::new(total as u64);
     pb.set_style(
@@ -34,59 +33,57 @@ fn main() {
             .progress_chars("#>-"),
     );
 
-    let mut mp3_file = File::create(format!("{}.mp3", args[1])).unwrap();
+    // the checkpoint file
+    let mut checkpoint_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(format!("{}.checkpoint", args[1]))
+        .unwrap();
+
+    // Read checkpoint
+    let mut checkpoint = String::new();
+    checkpoint_file.read_to_string(&mut checkpoint).unwrap();
+    let start_line: usize = checkpoint.trim().parse().unwrap_or(0);
+
+    pb.set_position(start_line as u64);
+
+    // Skip processed lines
+    lines.drain(0..start_line);
+
+    // the mp3 file
+    let mut mp3_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open(format!("{}.mp3", args[1]))
+        .unwrap();
+
+    mp3_file.seek(SeekFrom::End(0)).unwrap();
 
     for line in lines {
         let audio = gen_mp3(&mut en_tts, &mut zh_tts, &line);
         mp3_file.write_all(&audio).unwrap();
+        mp3_file.flush().unwrap();
         pb.inc(1);
+        write_checkpoint(pb.position() as usize, &mut checkpoint_file);
     }
     pb.finish_with_message("done");
 }
 
+fn write_checkpoint(line: usize, checkpoint_file: &mut File) {
+    checkpoint_file.seek(SeekFrom::Start(0)).unwrap();
+    checkpoint_file.write_all(format!("{}", line).as_bytes()).unwrap();
+    checkpoint_file.flush().unwrap();
+}
+
 
 fn gen_mp3(en_tts: &mut Edgetts, zh_tts: &mut Edgetts, text: &str) -> Vec<u8> {
-    let mut audio = Vec::new();
-    loop {
-        if text.is_empty() || text == "\n" {
-            break;
-        }
-
-        if contains_chinese(text) {
-            match zh_tts.gen_audio(text) {
-                Ok(result) => {
-                    audio = result;
-                    break;
-                }
-                Err(_) => {
-                    print!("zh_tts error: {}, try again\n", text);
-                    // Handle the error, e.g. retry or log the error, sleep for a while
-                    sleep(Duration::from_secs(60));
-                    let result = zh_tts.restart();
-                    if result.is_err() {
-                        println!("zh_tts restart error: {:?}", result);
-                    }
-                    continue;
-                }
-            }
-        } else {
-            match en_tts.gen_audio(text) {
-                Ok(result) => {
-                    audio = result;
-                    break;
-                }
-                Err(_) => {
-                    print!("en_tts error: {}, try again\n", text);
-                    // Handle the error, e.g. retry or log the error
-                    sleep(Duration::from_secs(60));
-                    let result = zh_tts.restart();
-                    if result.is_err() {
-                        println!("en_tts restart error: {:?}", result);
-                    }
-                    continue;
-                }
-            }
-        }
+    let audio;
+    if contains_chinese(text) {
+        audio = zh_tts.gen_audio(text).unwrap();
+    } else {
+        audio = en_tts.gen_audio(text).unwrap();
     }
     audio
 }
