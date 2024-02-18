@@ -70,7 +70,7 @@ fn trans_txt(fname: &str) -> anyhow::Result<()> {
         .read(true)
         .write(true)
         .create(true)
-        .open(format!("{}.checkpoint", fname))
+        .open(format!(".{}.checkpoint", fname))
         .unwrap();
 
     // Read checkpoint
