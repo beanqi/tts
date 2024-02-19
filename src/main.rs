@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
 use std::thread;
@@ -64,6 +65,7 @@ fn trans_txt(fname: &str) -> anyhow::Result<()> {
             .unwrap()
             .progress_chars("#>-"),
     );
+    pb.set_message(Cow::Owned(format!("Processing file: {}", fname)));
 
     // the checkpoint file
     let mut checkpoint_file = OpenOptions::new()
